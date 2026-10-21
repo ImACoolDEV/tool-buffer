@@ -1,4 +1,4 @@
--- Rake Killer Tool (TRUE KILL + FREEZE/LOCKDOWN TO PREVENT DAMAGE)
+-- Rake Killer Tool + Absolute Anti-Damage & Pushback Shield
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local CoreGui = game:GetService("CoreGui")
@@ -55,7 +55,7 @@ end)
 local TitleBar = Instance.new("TextLabel", MainFrame)
 TitleBar.Size = UDim2.new(1, 0, 0, 38)
 TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-TitleBar.Text = "💀 RAKE KILLER + ANTI-DAMAGE LOCKDOWN"
+TitleBar.Text = "💀 ABSOLUTE RAKE LOCKDOWN & SHIELD"
 TitleBar.TextColor3 = Color3.fromRGB(255, 80, 80)
 TitleBar.Font = Enum.Font.GothamBold
 TitleBar.TextSize = 11
@@ -66,7 +66,7 @@ local StatusLabel = Instance.new("TextLabel", MainFrame)
 StatusLabel.Size = UDim2.new(1, -20, 0, 45)
 StatusLabel.Position = UDim2.new(0, 10, 0, 45)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Hold tool with 'Main' script & click to activate Anti-Damage & True Kill!"
+StatusLabel.Text = "Hold tool with 'Main' script & click to activate full Anti-Damage Shield!"
 StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 11
@@ -77,22 +77,22 @@ local BuffButton = Instance.new("TextButton", MainFrame)
 BuffButton.Size = UDim2.new(0.88, 0, 0, 40)
 BuffButton.Position = UDim2.new(0.06, 0, 0.58, 0)
 BuffButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
-BuffButton.Text = "🛡️ ENABLE ANTI-DAMAGE & TRUE KILL"
+BuffButton.Text = "🛡️ APPLY BUFF & TRUE KILL"
 BuffButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 BuffButton.Font = Enum.Font.GothamBold
 BuffButton.TextSize = 11
 Instance.new("UICorner", BuffButton).CornerRadius = UDim.new(0, 8)
 
--- Freeze Toggle Button
-local FreezeToggleBtn = Instance.new("TextButton", MainFrame)
-FreezeToggleBtn.Size = UDim2.new(0.88, 0, 0, 35)
-FreezeToggleBtn.Position = UDim2.new(0.06, 0, 0.78, 0)
-FreezeToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-FreezeToggleBtn.Text = "🔒 RAKE FREEZE LOCK: OFF"
-FreezeToggleBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-FreezeToggleBtn.Font = Enum.Font.GothamBold
-FreezeToggleBtn.TextSize = 11
-Instance.new("UICorner", FreezeToggleBtn).CornerRadius = UDim.new(0, 8)
+-- Shield Toggle Button
+local ShieldToggleBtn = Instance.new("TextButton", MainFrame)
+ShieldToggleBtn.Size = UDim2.new(0.88, 0, 0, 35)
+ShieldToggleBtn.Position = UDim2.new(0.06, 0, 0.78, 0)
+ShieldToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+ShieldToggleBtn.Text = "🛡️ ANTI-DAMAGE SHIELD: OFF"
+ShieldToggleBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+ShieldToggleBtn.Font = Enum.Font.GothamBold
+ShieldToggleBtn.TextSize = 11
+Instance.new("UICorner", ShieldToggleBtn).CornerRadius = UDim.new(0, 8)
 
 -- Close Button
 local CloseButton = Instance.new("TextButton", MainFrame)
@@ -120,32 +120,36 @@ local function findRakeModel()
     return nil, nil
 end
 
--- Freeze / Lockdown toggle state
-local freezeEnabled = false
-FreezeToggleBtn.Activated:Connect(function()
-    freezeEnabled = not freezeEnabled
-    FreezeToggleBtn.Text = freezeEnabled and "🔒 RAKE FREEZE LOCK: ON" or "🔒 RAKE FREEZE LOCK: OFF"
-    FreezeToggleBtn.BackgroundColor3 = freezeEnabled and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(35, 35, 45)
-    FreezeToggleBtn.TextColor3 = freezeEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+-- Shield & Force-Push Toggle
+local shieldEnabled = false
+ShieldToggleBtn.Activated:Connect(function()
+    shieldEnabled = not shieldEnabled
+    ShieldToggleBtn.Text = shieldEnabled and "🛡️ ANTI-DAMAGE SHIELD: ON" or "🛡️ ANTI-DAMAGE SHIELD: OFF"
+    ShieldToggleBtn.BackgroundColor3 = shieldEnabled and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(35, 35, 45)
+    ShieldToggleBtn.TextColor3 = shieldEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
 end)
 
--- Anti-damage & Freeze loop (Forces Rake to stay frozen and stops him from moving or touching you)
+-- Active Shield Loop: If he gets within 25 studs, violently push him away and disable his damage parts
 RunService.Heartbeat:Connect(function()
-    if freezeEnabled then
+    if shieldEnabled then
         local rakeModel, rakePart = findRakeModel()
         local char = LocalPlayer.Character
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         
         if rakeModel and rakePart and hrp then
-            -- Anchor him so he cannot move toward you or attack
-            rakePart.Anchored = true
-            rakePart.Velocity = Vector3.zero
+            local distance = (hrp.Position - rakePart.Position).Magnitude
             
-            -- Keep him pushed away or locked in place so he can't damage you
-            local hum = rakeModel:FindFirstChildOfClass("Humanoid")
-            if hum then
-                hum.WalkSpeed = 0
-                hum.JumpPower = 0
+            -- If he gets too close, push him away instantly and disable his touch parts
+            if distance < 30 then
+                rakePart.CFrame = hrp.CFrame * CFrame.new(0, 0, -35)
+                rakePart.Velocity = Vector3.zero
+            end
+            
+            -- Clear out any hitboxes or damage touch parts on him
+            for _, part in ipairs(rakeModel:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanTouch = false
+                end
             end
         end
     end
@@ -210,5 +214,5 @@ BuffButton.Activated:Connect(function()
     end
 
     StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
-    StatusLabel.Text = "✅ Ready! Turn on 'Rake Freeze Lock' to completely stop him from moving or damaging you."
+    StatusLabel.Text = "✅ Ready! Turn on 'Anti-Damage Shield' to push him back and disable his touch hitboxes."
 end)
