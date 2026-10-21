@@ -1,13 +1,13 @@
--- Rake Killer Tool (Checks for Script named 'Main' | 999B Damage | Target: THE_RAKE Only)
+-- Rake Killer Tool (TRUE KILL + FREEZE/LOCKDOWN TO PREVENT DAMAGE)
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 local LocalPlayer = Players.LocalPlayer
 local ParentGui = (pcall(function() return gethui() end) and gethui()) or CoreGui
 
--- Cleanup old GUI if it exists
 if ParentGui:FindFirstChild("RakeKillerGui") then
     ParentGui.RakeKillerGui:Destroy()
 end
@@ -17,10 +17,9 @@ ScreenGui.Name = "RakeKillerGui"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 999
 
--- Main Window Frame
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Size = UDim2.new(0, 360, 0, 220)
+MainFrame.Size = UDim2.new(0, 360, 0, 240)
 MainFrame.Position = UDim2.new(0.5, 0, 0.4, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
@@ -56,7 +55,7 @@ end)
 local TitleBar = Instance.new("TextLabel", MainFrame)
 TitleBar.Size = UDim2.new(1, 0, 0, 38)
 TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-TitleBar.Text = "💀 RAKE KILLER TOOL ('MAIN' SCRIPT CHECK)"
+TitleBar.Text = "💀 RAKE KILLER + ANTI-DAMAGE LOCKDOWN"
 TitleBar.TextColor3 = Color3.fromRGB(255, 80, 80)
 TitleBar.Font = Enum.Font.GothamBold
 TitleBar.TextSize = 11
@@ -67,7 +66,7 @@ local StatusLabel = Instance.new("TextLabel", MainFrame)
 StatusLabel.Size = UDim2.new(1, -20, 0, 45)
 StatusLabel.Position = UDim2.new(0, 10, 0, 45)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Hold a tool containing a 'Main' script in your hand, then click below!"
+StatusLabel.Text = "Hold tool with 'Main' script & click to activate Anti-Damage & True Kill!"
 StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 11
@@ -75,14 +74,25 @@ StatusLabel.TextWrapped = true
 
 -- Action Button
 local BuffButton = Instance.new("TextButton", MainFrame)
-BuffButton.Size = UDim2.new(0.88, 0, 0, 45)
-BuffButton.Position = UDim2.new(0.06, 0, 0.62, 0)
+BuffButton.Size = UDim2.new(0.88, 0, 0, 40)
+BuffButton.Position = UDim2.new(0.06, 0, 0.58, 0)
 BuffButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
-BuffButton.Text = "⚡ MODIFY 'MAIN' SCRIPT & HELD TOOL"
+BuffButton.Text = "🛡️ ENABLE ANTI-DAMAGE & TRUE KILL"
 BuffButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 BuffButton.Font = Enum.Font.GothamBold
 BuffButton.TextSize = 11
 Instance.new("UICorner", BuffButton).CornerRadius = UDim.new(0, 8)
+
+-- Freeze Toggle Button
+local FreezeToggleBtn = Instance.new("TextButton", MainFrame)
+FreezeToggleBtn.Size = UDim2.new(0.88, 0, 0, 35)
+FreezeToggleBtn.Position = UDim2.new(0.06, 0, 0.78, 0)
+FreezeToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+FreezeToggleBtn.Text = "🔒 RAKE FREEZE LOCK: OFF"
+FreezeToggleBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+FreezeToggleBtn.Font = Enum.Font.GothamBold
+FreezeToggleBtn.TextSize = 11
+Instance.new("UICorner", FreezeToggleBtn).CornerRadius = UDim.new(0, 8)
 
 -- Close Button
 local CloseButton = Instance.new("TextButton", MainFrame)
@@ -99,75 +109,99 @@ CloseButton.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Main Modification Logic
+-- Find Rake helper
+local function findRakeModel()
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") and (obj.Name == "THE_RAKE" or obj.Name:lower():find("rake") or obj.Name:lower():find("rakoof")) and not Players:GetPlayerFromCharacter(obj) then
+            local part = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Torso") or obj:FindFirstChildWhichIsA("BasePart")
+            if part then return obj, part end
+        end
+    end
+    return nil, nil
+end
+
+-- Freeze / Lockdown toggle state
+local freezeEnabled = false
+FreezeToggleBtn.Activated:Connect(function()
+    freezeEnabled = not freezeEnabled
+    FreezeToggleBtn.Text = freezeEnabled and "🔒 RAKE FREEZE LOCK: ON" or "🔒 RAKE FREEZE LOCK: OFF"
+    FreezeToggleBtn.BackgroundColor3 = freezeEnabled and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(35, 35, 45)
+    FreezeToggleBtn.TextColor3 = freezeEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+end)
+
+-- Anti-damage & Freeze loop (Forces Rake to stay frozen and stops him from moving or touching you)
+RunService.Heartbeat:Connect(function()
+    if freezeEnabled then
+        local rakeModel, rakePart = findRakeModel()
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        
+        if rakeModel and rakePart and hrp then
+            -- Anchor him so he cannot move toward you or attack
+            rakePart.Anchored = true
+            rakePart.Velocity = Vector3.zero
+            
+            -- Keep him pushed away or locked in place so he can't damage you
+            local hum = rakeModel:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.WalkSpeed = 0
+                hum.JumpPower = 0
+            end
+        end
+    end
+end)
+
 BuffButton.Activated:Connect(function()
     local char = LocalPlayer.Character
     local tool = char and char:FindFirstChildOfClass("Tool")
     
     if not tool then
         StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "❌ Error: You are not holding any tool in your hand!"
+        StatusLabel.Text = "❌ Hold a tool in your hand first!"
         return
     end
 
-    -- Check specifically for a script named 'Main'
     local mainScript = tool:FindFirstChild("Main", true)
-    
     if not mainScript then
         StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "❌ Error: No script named 'Main' found inside tool '" .. tool.Name .. "'!"
+        StatusLabel.Text = "❌ No 'Main' script found in tool!"
         return
     end
 
-    -- 1. Strip all animations so there are no delays/animations
+    -- 1. Remove animations / flopping
     for _, obj in ipairs(tool:GetDescendants()) do
-        if obj:IsA("Animation") or obj:IsA("AnimationTrack") or obj.Name:lower():find("anim") then
+        if obj:IsA("Animation") or obj:IsA("AnimationTrack") or obj.Name:lower():find("anim") or obj.Name:lower():find("flop") or obj.Name:lower():find("ragdoll") then
             pcall(function() obj:Destroy() end)
         end
     end
 
-    -- 2. Modify any values or configure parameters associated with the 'Main' script
-    local modifiedCount = 1
-    pcall(function()
-        if mainScript:IsA("LocalScript") or mainScript:IsA("Script") then
-            -- Disable animation parameters or throttling if accessible via attributes/values
-            mainScript:SetAttribute("Damage", 999999999999)
-            mainScript:SetAttribute("Cooldown", 0.000001)
-        end
-    end)
-
-    -- Look for value objects inside the tool or main script
-    for _, obj in ipairs(tool:GetDescendants()) do
-        if obj:IsA("NumberValue") or obj:IsA("IntValue") then
-            local n = obj.Name:lower()
-            if n:find("dmg") or n:find("damage") then
-                obj.Value = 999999999999
-                modifiedCount = modifiedCount + 1
-            elseif n:find("cooldown") or n:find("delay") or n:find("rate") then
-                obj.Value = 0.000001
-                modifiedCount = modifiedCount + 1
-            end
-        end
-    end
-
-    -- 3. Setup Touch connection strictly for THE_RAKE
+    -- 2. Hook Handle Touch to execute True Kill instantly
     local handle = tool:FindFirstChild("Handle") or tool:FindFirstChildWhichIsA("BasePart")
     if handle then
-        if not tool:FindFirstChild("RakeKillerConnection") then
-            local connTag = Instance.new("BoolValue")
-            connTag.Name = "RakeKillerConnection"
-            connTag.Parent = tool
+        if not tool:FindFirstChild("TrueRakeKillerTag") then
+            local tag = Instance.new("BoolValue", tool)
+            tag.Name = "TrueRakeKillerTag"
 
             handle.Touched:Connect(function(hit)
                 if not hit or not hit.Parent then return end
                 local hitModel = hit:FindFirstAncestorOfClass("Model")
                 
-                -- Verify it is THE_RAKE and NOT a player
-                if hitModel and (hitModel.Name == "THE_RAKE" or hitModel.Name:lower():find("rake")) then
+                if hitModel and (hitModel.Name == "THE_RAKE" or hitModel.Name:lower():find("rake") or hitModel.Name:lower():find("rakoof")) and not Players:GetPlayerFromCharacter(hitModel) then
                     local hum = hitModel:FindFirstChildOfClass("Humanoid")
+                    
                     if hum then
                         pcall(function()
-                            hum.Health = hum.Health - 999999999999
+                            hum.Health = 0
+                            hum:ChangeState(Enum.HumanoidStateType.Dead)
+                            
+                            for _, remote in ipairs(tool:GetDescendants()) do
+                                if remote:IsA("RemoteEvent") or remote:IsA("UnreliableRemoteEvent") then
+                                    remote:FireServer(hum, 999999999999)
+                                    remote:FireServer(hitModel, 999999999999)
+                                end
+                            end
+                            
+                            hitModel:BreakJoints()
                         end)
                     end
                 end
@@ -176,5 +210,5 @@ BuffButton.Activated:Connect(function()
     end
 
     StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
-    StatusLabel.Text = "✅ Success! 'Main' script verified on '" .. tool.Name .. "'. Configured to 999B Damage targeting THE_RAKE only (No Animations)."
+    StatusLabel.Text = "✅ Ready! Turn on 'Rake Freeze Lock' to completely stop him from moving or damaging you."
 end)
