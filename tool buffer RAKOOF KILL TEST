@@ -1,4 +1,4 @@
--- Rake Killer Tool + Absolute Anti-Damage & Pushback Shield
+-- Rake Killer Tool + Optimized Lag-Free Anti-Damage Shield
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local CoreGui = game:GetService("CoreGui")
@@ -55,7 +55,7 @@ end)
 local TitleBar = Instance.new("TextLabel", MainFrame)
 TitleBar.Size = UDim2.new(1, 0, 0, 38)
 TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-TitleBar.Text = "💀 ABSOLUTE RAKE LOCKDOWN & SHIELD"
+TitleBar.Text = "💀 LAG-FREE RAKE SHIELD & KILLER"
 TitleBar.TextColor3 = Color3.fromRGB(255, 80, 80)
 TitleBar.Font = Enum.Font.GothamBold
 TitleBar.TextSize = 11
@@ -66,7 +66,7 @@ local StatusLabel = Instance.new("TextLabel", MainFrame)
 StatusLabel.Size = UDim2.new(1, -20, 0, 45)
 StatusLabel.Position = UDim2.new(0, 10, 0, 45)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Hold tool with 'Main' script & click to activate full Anti-Damage Shield!"
+StatusLabel.Text = "Hold tool with 'Main' script & click to activate optimized shield!"
 StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 11
@@ -88,7 +88,7 @@ local ShieldToggleBtn = Instance.new("TextButton", MainFrame)
 ShieldToggleBtn.Size = UDim2.new(0.88, 0, 0, 35)
 ShieldToggleBtn.Position = UDim2.new(0.06, 0, 0.78, 0)
 ShieldToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-ShieldToggleBtn.Text = "🛡️ ANTI-DAMAGE SHIELD: OFF"
+ShieldToggleBtn.Text = "🛡️ OPTIMIZED SHIELD: OFF"
 ShieldToggleBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
 ShieldToggleBtn.Font = Enum.Font.GothamBold
 ShieldToggleBtn.TextSize = 11
@@ -109,10 +109,10 @@ CloseButton.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Find Rake helper
+-- Fast Rake Finder (cached/targeted)
 local function findRakeModel()
-    for _, obj in ipairs(Workspace:GetDescendants()) do
-        if obj:IsA("Model") and (obj.Name == "THE_RAKE" or obj.Name:lower():find("rake") or obj.Name:lower():find("rakoof")) and not Players:GetPlayerFromCharacter(obj) then
+    for _, obj in ipairs(Workspace:GetChildren()) do
+        if obj:IsA("Model") and (obj.Name == "THE_RAKE" or obj.Name:lower():find("rake") or obj.Name:lower():find("rakoof")) then
             local part = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Torso") or obj:FindFirstChildWhichIsA("BasePart")
             if part then return obj, part end
         end
@@ -120,37 +120,33 @@ local function findRakeModel()
     return nil, nil
 end
 
--- Shield & Force-Push Toggle
 local shieldEnabled = false
 ShieldToggleBtn.Activated:Connect(function()
     shieldEnabled = not shieldEnabled
-    ShieldToggleBtn.Text = shieldEnabled and "🛡️ ANTI-DAMAGE SHIELD: ON" or "🛡️ ANTI-DAMAGE SHIELD: OFF"
+    ShieldToggleBtn.Text = shieldEnabled and "🛡️ OPTIMIZED SHIELD: ON" or "🛡️ OPTIMIZED SHIELD: OFF"
     ShieldToggleBtn.BackgroundColor3 = shieldEnabled and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(35, 35, 45)
     ShieldToggleBtn.TextColor3 = shieldEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
 end)
 
--- Active Shield Loop: If he gets within 25 studs, violently push him away and disable his damage parts
-RunService.Heartbeat:Connect(function()
-    if shieldEnabled then
-        local rakeModel, rakePart = findRakeModel()
-        local char = LocalPlayer.Character
-        local hrp = char and char:FindFirstChild("HumanoidRootPart")
-        
-        if rakeModel and rakePart and hrp then
-            local distance = (hrp.Position - rakePart.Position).Magnitude
-            
-            -- If he gets too close, push him away instantly and disable his touch parts
-            if distance < 30 then
-                rakePart.CFrame = hrp.CFrame * CFrame.new(0, 0, -35)
-                rakePart.Velocity = Vector3.zero
-            end
-            
-            -- Clear out any hitboxes or damage touch parts on him
-            for _, part in ipairs(rakeModel:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanTouch = false
+-- Lightweight background task running every 0.1 seconds instead of every frame to eliminate lag
+task.spawn(function()
+    while true do
+        if shieldEnabled then
+            pcall(function()
+                local rakeModel, rakePart = findRakeModel()
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                
+                if rakeModel and rakePart and hrp then
+                    local distance = (hrp.Position - rakePart.Position).Magnitude
+                    if distance < 30 then
+                        rakePart.CFrame = hrp.CFrame * CFrame.new(0, 0, -35)
+                    end
                 end
-            end
+            end)
+            task.wait(0.1)
+        else
+            task.wait(0.5)
         end
     end
 end)
@@ -172,14 +168,12 @@ BuffButton.Activated:Connect(function()
         return
     end
 
-    -- 1. Remove animations / flopping
     for _, obj in ipairs(tool:GetDescendants()) do
         if obj:IsA("Animation") or obj:IsA("AnimationTrack") or obj.Name:lower():find("anim") or obj.Name:lower():find("flop") or obj.Name:lower():find("ragdoll") then
             pcall(function() obj:Destroy() end)
         end
     end
 
-    -- 2. Hook Handle Touch to execute True Kill instantly
     local handle = tool:FindFirstChild("Handle") or tool:FindFirstChildWhichIsA("BasePart")
     if handle then
         if not tool:FindFirstChild("TrueRakeKillerTag") then
@@ -192,19 +186,16 @@ BuffButton.Activated:Connect(function()
                 
                 if hitModel and (hitModel.Name == "THE_RAKE" or hitModel.Name:lower():find("rake") or hitModel.Name:lower():find("rakoof")) and not Players:GetPlayerFromCharacter(hitModel) then
                     local hum = hitModel:FindFirstChildOfClass("Humanoid")
-                    
                     if hum then
                         pcall(function()
                             hum.Health = 0
                             hum:ChangeState(Enum.HumanoidStateType.Dead)
-                            
                             for _, remote in ipairs(tool:GetDescendants()) do
                                 if remote:IsA("RemoteEvent") or remote:IsA("UnreliableRemoteEvent") then
                                     remote:FireServer(hum, 999999999999)
                                     remote:FireServer(hitModel, 999999999999)
                                 end
                             end
-                            
                             hitModel:BreakJoints()
                         end)
                     end
@@ -214,5 +205,5 @@ BuffButton.Activated:Connect(function()
     end
 
     StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
-    StatusLabel.Text = "✅ Ready! Turn on 'Anti-Damage Shield' to push him back and disable his touch hitboxes."
+    StatusLabel.Text = "✅ Ready! Shield optimized to run lag-free."
 end)
