@@ -1,0 +1,180 @@
+-- Rake Killer Tool (Checks for Script named 'Main' | 999B Damage | Target: THE_RAKE Only)
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local ParentGui = (pcall(function() return gethui() end) and gethui()) or CoreGui
+
+-- Cleanup old GUI if it exists
+if ParentGui:FindFirstChild("RakeKillerGui") then
+    ParentGui.RakeKillerGui:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui", ParentGui)
+ScreenGui.Name = "RakeKillerGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 999
+
+-- Main Window Frame
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Size = UDim2.new(0, 360, 0, 220)
+MainFrame.Position = UDim2.new(0.5, 0, 0.4, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+local MainStroke = Instance.new("UIStroke", MainFrame)
+MainStroke.Thickness = 2
+MainStroke.Color = Color3.fromRGB(255, 50, 50)
+
+-- Draggable implementation
+local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Title Bar
+local TitleBar = Instance.new("TextLabel", MainFrame)
+TitleBar.Size = UDim2.new(1, 0, 0, 38)
+TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+TitleBar.Text = "💀 RAKE KILLER TOOL ('MAIN' SCRIPT CHECK)"
+TitleBar.TextColor3 = Color3.fromRGB(255, 80, 80)
+TitleBar.Font = Enum.Font.GothamBold
+TitleBar.TextSize = 11
+Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 12)
+
+-- Status Text
+local StatusLabel = Instance.new("TextLabel", MainFrame)
+StatusLabel.Size = UDim2.new(1, -20, 0, 45)
+StatusLabel.Position = UDim2.new(0, 10, 0, 45)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Hold a tool containing a 'Main' script in your hand, then click below!"
+StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 11
+StatusLabel.TextWrapped = true
+
+-- Action Button
+local BuffButton = Instance.new("TextButton", MainFrame)
+BuffButton.Size = UDim2.new(0.88, 0, 0, 45)
+BuffButton.Position = UDim2.new(0.06, 0, 0.62, 0)
+BuffButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+BuffButton.Text = "⚡ MODIFY 'MAIN' SCRIPT & HELD TOOL"
+BuffButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+BuffButton.Font = Enum.Font.GothamBold
+BuffButton.TextSize = 11
+Instance.new("UICorner", BuffButton).CornerRadius = UDim.new(0, 8)
+
+-- Close Button
+local CloseButton = Instance.new("TextButton", MainFrame)
+CloseButton.Size = UDim2.new(0, 24, 0, 24)
+CloseButton.Position = UDim2.new(1, -30, 0, 7)
+CloseButton.BackgroundColor3 = Color3.fromRGB(150, 20, 20)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 10
+Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(0, 6)
+
+CloseButton.Activated:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Main Modification Logic
+BuffButton.Activated:Connect(function()
+    local char = LocalPlayer.Character
+    local tool = char and char:FindFirstChildOfClass("Tool")
+    
+    if not tool then
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        StatusLabel.Text = "❌ Error: You are not holding any tool in your hand!"
+        return
+    end
+
+    -- Check specifically for a script named 'Main'
+    local mainScript = tool:FindFirstChild("Main", true)
+    
+    if not mainScript then
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        StatusLabel.Text = "❌ Error: No script named 'Main' found inside tool '" .. tool.Name .. "'!"
+        return
+    end
+
+    -- 1. Strip all animations so there are no delays/animations
+    for _, obj in ipairs(tool:GetDescendants()) do
+        if obj:IsA("Animation") or obj:IsA("AnimationTrack") or obj.Name:lower():find("anim") then
+            pcall(function() obj:Destroy() end)
+        end
+    end
+
+    -- 2. Modify any values or configure parameters associated with the 'Main' script
+    local modifiedCount = 1
+    pcall(function()
+        if mainScript:IsA("LocalScript") or mainScript:IsA("Script") then
+            -- Disable animation parameters or throttling if accessible via attributes/values
+            mainScript:SetAttribute("Damage", 999999999999)
+            mainScript:SetAttribute("Cooldown", 0.000001)
+        end
+    end)
+
+    -- Look for value objects inside the tool or main script
+    for _, obj in ipairs(tool:GetDescendants()) do
+        if obj:IsA("NumberValue") or obj:IsA("IntValue") then
+            local n = obj.Name:lower()
+            if n:find("dmg") or n:find("damage") then
+                obj.Value = 999999999999
+                modifiedCount = modifiedCount + 1
+            elseif n:find("cooldown") or n:find("delay") or n:find("rate") then
+                obj.Value = 0.000001
+                modifiedCount = modifiedCount + 1
+            end
+        end
+    end
+
+    -- 3. Setup Touch connection strictly for THE_RAKE
+    local handle = tool:FindFirstChild("Handle") or tool:FindFirstChildWhichIsA("BasePart")
+    if handle then
+        if not tool:FindFirstChild("RakeKillerConnection") then
+            local connTag = Instance.new("BoolValue")
+            connTag.Name = "RakeKillerConnection"
+            connTag.Parent = tool
+
+            handle.Touched:Connect(function(hit)
+                if not hit or not hit.Parent then return end
+                local hitModel = hit:FindFirstAncestorOfClass("Model")
+                
+                -- Verify it is THE_RAKE and NOT a player
+                if hitModel and (hitModel.Name == "THE_RAKE" or hitModel.Name:lower():find("rake")) then
+                    local hum = hitModel:FindFirstChildOfClass("Humanoid")
+                    if hum then
+                        pcall(function()
+                            hum.Health = hum.Health - 999999999999
+                        end)
+                    end
+                end
+            end)
+        end
+    end
+
+    StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
+    StatusLabel.Text = "✅ Success! 'Main' script verified on '" .. tool.Name .. "'. Configured to 999B Damage targeting THE_RAKE only (No Animations)."
+end)
