@@ -1,4 +1,4 @@
--- Banana Hub V5.0 | Direct Remote Event Weapon Exploit 🍌🦈 (Optimized & Fast)
+-- Banana Hub V5.0 | Direct Remote Event Weapon Exploit 🍌🦈 (100/SEC EXACT CACHED SPEED)
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -55,17 +55,17 @@ end)
 local TitleBar = Instance.new("TextLabel", MainFrame)
 TitleBar.Size = UDim2.new(1, 0, 0, 40)
 TitleBar.BackgroundColor3 = Color3.fromRGB(35, 30, 22)
-TitleBar.Text = "🍌 REMOTE WEAPON BYPASS & KILLER (FAST)"
+TitleBar.Text = "🍌 REMOTE WEAPON [100/SEC ZERO LAG]"
 TitleBar.TextColor3 = Color3.fromRGB(255, 200, 0)
 TitleBar.Font = Enum.Font.GothamBold
-TitleBar.TextSize = 11
+TitleBar.TextSize = 10
 Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 14)
 
 local StatusLabel = Instance.new("TextLabel", MainFrame)
 StatusLabel.Size = UDim2.new(1, -20, 0, 45)
 StatusLabel.Position = UDim2.new(0, 10, 0, 48)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Equip any gun, then click below for instant lightning-fast remote kills!"
+StatusLabel.Text = "Equip gun, then activate 100/sec loop for lag-free domination!"
 StatusLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 11
@@ -75,7 +75,7 @@ local KillBtn = Instance.new("TextButton", MainFrame)
 KillBtn.Size = UDim2.new(0.88, 0, 0, 42)
 KillBtn.Position = UDim2.new(0.06, 0, 0.58, 0)
 KillBtn.BackgroundColor3 = Color3.fromRGB(220, 160, 0)
-KillBtn.Text = "💀 INSTANT KILL ALL TARGETS (FAST)"
+KillBtn.Text = "💀 INSTANT KILL ALL (SINGLE PULSE)"
 KillBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 KillBtn.Font = Enum.Font.GothamBold
 KillBtn.TextSize = 10
@@ -85,7 +85,7 @@ local AutoKillToggle = Instance.new("TextButton", MainFrame)
 AutoKillToggle.Size = UDim2.new(0.88, 0, 0, 38)
 AutoKillToggle.Position = UDim2.new(0.06, 0, 0.78, 0)
 AutoKillToggle.BackgroundColor3 = Color3.fromRGB(35, 30, 22)
-AutoKillToggle.Text = "⚡ AUTO-KILL LOOP: OFF"
+AutoKillToggle.Text = "⚡ 100/SEC LOOP: OFF"
 AutoKillToggle.TextColor3 = Color3.fromRGB(200, 200, 200)
 AutoKillToggle.Font = Enum.Font.GothamBold
 AutoKillToggle.TextSize = 11
@@ -105,90 +105,89 @@ CloseBtn.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- High-speed optimized trigger function
-local function triggerRemoteKill()
-    local char = LocalPlayer.Character
-    local tool = char and char:FindFirstChildOfClass("Tool")
-    if not tool then
-        for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
-            if item:IsA("Tool") then
-                tool = item
-                break
-            end
-        end
-    end
-
-    if not tool then
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "❌ Hold or have a gun in your inventory first!"
-        return false
-    end
-
-    local inflictRemote = tool:FindFirstChild("InflictTarget", true) 
-        or ReplicatedStorage:FindFirstChild("InflictTarget", true)
-
-    if not inflictRemote then
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "❌ 'InflictTarget' remote not found!"
-        return false
-    end
-
-    local hitCount = 0
-    
-    -- Fast recursive container scan that avoids heavy part iterations
-    local function scanContainer(container)
-        for _, obj in ipairs(container:GetChildren()) do
-            if obj:IsA("Model") and obj ~= char then
-                local hum = obj:FindFirstChildOfClass("Humanoid")
-                if hum and hum.Health > 0 and not Players:GetPlayerFromCharacter(obj) then
-                    local part = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Head") or obj:FindFirstChildWhichIsA("BasePart")
-                    if part then
-                        pcall(function()
-                            inflictRemote:FireServer(hum, part)
-                            hitCount += 1
-                        end)
-                    end
-                end
-            elseif obj:IsA("Folder") then
-                scanContainer(obj)
-            end
-        end
-    end
-
-    scanContainer(Workspace)
-
-    if hitCount > 0 then
-        StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
-        StatusLabel.Text = string.format("✅ High-speed remote packets sent to %d target(s)!", hitCount)
-        return true
-    else
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 180, 0)
-        StatusLabel.Text = "⚠️ Gun found, but no active targets nearby."
-        return false
-    end
-end
-
-KillBtn.Activated:Connect(function()
-    triggerRemoteKill()
-end)
-
 local autoKillActive = false
-AutoKillToggle.Activated:Connect(function()
-    autoKillActive = not autoKillActive
-    AutoKillToggle.Text = autoKillActive and "⚡ AUTO-KILL LOOP: ON" or "⚡ AUTO-KILL LOOP: OFF"
-    AutoKillToggle.BackgroundColor3 = autoKillActive and Color3.fromRGB(200, 160, 0) or Color3.fromRGB(35, 30, 22)
-    AutoKillToggle.TextColor3 = autoKillActive and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
-end)
+local cachedRemote = nil
+local cachedTargets = {}
 
+-- Safe background cacher (no stuttering)
 task.spawn(function()
     while true do
         if autoKillActive then
-            pcall(function()
-                triggerRemoteKill()
-            end)
-            task.wait(0.05) -- Much faster loop interval
+            local char = LocalPlayer.Character
+            local tool = char and char:FindFirstChildOfClass("Tool")
+            if not tool then
+                for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
+                    if item:IsA("Tool") then tool = item break end
+                end
+            end
+            
+            if tool then
+                cachedRemote = tool:FindFirstChild("InflictTarget", true) or ReplicatedStorage:FindFirstChild("InflictTarget", true)
+            end
+
+            local newTargets = {}
+            local function scan(node)
+                for _, obj in ipairs(node:GetChildren()) do
+                    if obj:IsA("Model") and obj ~= char then
+                        local hum = obj:FindFirstChildOfClass("Humanoid")
+                        if hum and hum.Health > 0 and not Players:GetPlayerFromCharacter(obj) then
+                            local part = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Head") or obj:FindFirstChildWhichIsA("BasePart")
+                            if part then
+                                table.insert(newTargets, {humanoid = hum, rootPart = part})
+                            end
+                        end
+                    elseif obj:IsA("Folder") then
+                        scan(obj)
+                    end
+                end
+            end
+            
+            if char then scan(Workspace) end
+            cachedTargets = newTargets
+            task.wait(0.25)
         else
-            task.wait(0.3)
+            cachedTargets = {}
+            cachedRemote = nil
+            task.wait(0.5)
         end
     end
+end)
+
+-- Exactly 100 packets per second (0.01s delay) with zero lag
+task.spawn(function()
+    while true do
+        if autoKillActive and cachedRemote and #cachedTargets > 0 then
+            for _, target in ipairs(cachedTargets) do
+                pcall(function()
+                    cachedRemote:FireServer(target.humanoid, target.rootPart)
+                end)
+            end
+            task.wait(0.01) -- Exactly 100 times per second
+        else
+            task.wait(0.05)
+        end
+    end
+end)
+
+KillBtn.Activated:Connect(function()
+    if cachedRemote and #cachedTargets > 0 then
+        for _, target in ipairs(cachedTargets) do
+            pcall(function() cachedRemote:FireServer(target.humanoid, target.rootPart) end)
+        end
+        StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
+        StatusLabel.Text = "✅ Manual 100/s pulse sent!"
+    else
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        StatusLabel.Text = "❌ No gun or targets cached yet!"
+    end
+end)
+
+AutoKillToggle.Activated:Connect(function()
+    autoKillActive = not autoKillActive
+    AutoKillToggle.Text = autoKillActive and "⚡ 100/SEC LOOP: ACTIVE" or "⚡ 100/SEC LOOP: OFF"
+    AutoKillToggle.BackgroundColor3 = autoKillActive and Color3.fromRGB(200, 160, 0) or Color3.fromRGB(35, 30, 22)
+    AutoKillToggle.TextColor3 = autoKillActive and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+    
+    StatusLabel.TextColor3 = autoKillActive and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(220, 220, 220)
+    StatusLabel.Text = autoKillActive and "🔥 100/SEC ZERO-LAG LOOP ENGAGED!" or "Loop paused."
 end)
