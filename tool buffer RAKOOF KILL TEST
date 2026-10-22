@@ -66,7 +66,7 @@ local StatusLabel = Instance.new("TextLabel", MainFrame)
 StatusLabel.Size = UDim2.new(1, -20, 0, 45)
 StatusLabel.Position = UDim2.new(0, 10, 0, 45)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Hold tool with 'Main' script & click to activate optimized shield!"
+StatusLabel.Text = "Hold tool in hand & click apply buff to maximize damage & range!"
 StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 11
@@ -109,7 +109,7 @@ CloseButton.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Fast Rake Finder (cached/targeted)
+-- Fast Rake Finder
 local function findRakeModel()
     for _, obj in ipairs(Workspace:GetChildren()) do
         if obj:IsA("Model") and (obj.Name == "THE_RAKE" or obj.Name:lower():find("rake") or obj.Name:lower():find("rakoof")) then
@@ -128,7 +128,7 @@ ShieldToggleBtn.Activated:Connect(function()
     ShieldToggleBtn.TextColor3 = shieldEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
 end)
 
--- Lightweight background task running every 0.1 seconds instead of every frame to eliminate lag
+-- Lightweight background shield task
 task.spawn(function()
     while true do
         if shieldEnabled then
@@ -139,7 +139,7 @@ task.spawn(function()
                 
                 if rakeModel and rakePart and hrp then
                     local distance = (hrp.Position - rakePart.Position).Magnitude
-                    if distance < 30 then
+                    if distance < 35 then
                         rakePart.CFrame = hrp.CFrame * CFrame.new(0, 0, -35)
                     end
                 end
@@ -157,23 +157,35 @@ BuffButton.Activated:Connect(function()
     
     if not tool then
         StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "❌ Hold a tool in your hand first!"
+        StatusLabel.Text = "❌ Hold your StunStick tool in your hand first!"
         return
     end
 
-    local mainScript = tool:FindFirstChild("Main", true)
-    if not mainScript then
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "❌ No 'Main' script found in tool!"
-        return
-    end
-
-    for _, obj in ipairs(tool:GetDescendants()) do
-        if obj:IsA("Animation") or obj:IsA("AnimationTrack") or obj.Name:lower():find("anim") or obj.Name:lower():find("flop") or obj.Name:lower():find("ragdoll") then
-            pcall(function() obj:Destroy() end)
+    -- Boost configuration values matching your tool screenshot structure
+    local config = tool:FindFirstChild("Configuration")
+    if config then
+        local dmg = config:FindFirstChild("Damage")
+        if dmg and dmg:IsA("NumberValue") then
+            dmg.Value = 999999999
+        end
+        local hitCd = config:FindFirstChild("HitCD")
+        if hitCd and hitCd:IsA("NumberValue") then
+            hitCd.Value = 0
         end
     end
 
+    -- Also check descendants for any other Damage/HitCD values
+    for _, obj in ipairs(tool:GetDescendants()) do
+        if obj:IsA("NumberValue") or obj:IsA("IntValue") then
+            if obj.Name:lower() == "damage" then
+                obj.Value = 999999999
+            elseif obj.Name:lower() == "hitcd" or obj.Name:lower() == "cooldown" then
+                obj.Value = 0
+            end
+        end
+    end
+
+    -- Setup touch listener to instantly kill the Rake on impact using the tool handle
     local handle = tool:FindFirstChild("Handle") or tool:FindFirstChildWhichIsA("BasePart")
     if handle then
         if not tool:FindFirstChild("TrueRakeKillerTag") then
@@ -190,10 +202,11 @@ BuffButton.Activated:Connect(function()
                         pcall(function()
                             hum.Health = 0
                             hum:ChangeState(Enum.HumanoidStateType.Dead)
+                            -- Fire any remote events found inside the tool to sync with the server
                             for _, remote in ipairs(tool:GetDescendants()) do
                                 if remote:IsA("RemoteEvent") or remote:IsA("UnreliableRemoteEvent") then
-                                    remote:FireServer(hum, 999999999999)
-                                    remote:FireServer(hitModel, 999999999999)
+                                    remote:FireServer(hum, 999999999)
+                                    remote:FireServer(hitModel, 999999999)
                                 end
                             end
                             hitModel:BreakJoints()
@@ -205,5 +218,5 @@ BuffButton.Activated:Connect(function()
     end
 
     StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
-    StatusLabel.Text = "✅ Ready! Shield optimized to run lag-free."
+    StatusLabel.Text = "✅ Tool Buffed! Damage set to max & Cooldown cleared."
 end)
