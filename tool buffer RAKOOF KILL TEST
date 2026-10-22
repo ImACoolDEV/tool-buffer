@@ -1,9 +1,10 @@
--- Banana Hub V5.0 | Direct Remote Event Weapon Exploit 🍌🦈
+-- Banana Hub V5.0 | Direct Remote Event Weapon Exploit 🍌🦈 (Optimized & Fast)
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LocalPlayer = Players.LocalPlayer
 local ParentGui = (pcall(function() return gethui() end) and gethui()) or CoreGui
@@ -54,7 +55,7 @@ end)
 local TitleBar = Instance.new("TextLabel", MainFrame)
 TitleBar.Size = UDim2.new(1, 0, 0, 40)
 TitleBar.BackgroundColor3 = Color3.fromRGB(35, 30, 22)
-TitleBar.Text = "🍌 REMOTE WEAPON BYPASS & KILLER"
+TitleBar.Text = "🍌 REMOTE WEAPON BYPASS & KILLER (FAST)"
 TitleBar.TextColor3 = Color3.fromRGB(255, 200, 0)
 TitleBar.Font = Enum.Font.GothamBold
 TitleBar.TextSize = 11
@@ -64,7 +65,7 @@ local StatusLabel = Instance.new("TextLabel", MainFrame)
 StatusLabel.Size = UDim2.new(1, -20, 0, 45)
 StatusLabel.Position = UDim2.new(0, 10, 0, 48)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Equip any gun, then click below to force-inflict damage via server remotes!"
+StatusLabel.Text = "Equip any gun, then click below for instant lightning-fast remote kills!"
 StatusLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 11
@@ -74,7 +75,7 @@ local KillBtn = Instance.new("TextButton", MainFrame)
 KillBtn.Size = UDim2.new(0.88, 0, 0, 42)
 KillBtn.Position = UDim2.new(0.06, 0, 0.58, 0)
 KillBtn.BackgroundColor3 = Color3.fromRGB(220, 160, 0)
-KillBtn.Text = "💀 INSTANT KILL ALL TARGETS (REMOTE)"
+KillBtn.Text = "💀 INSTANT KILL ALL TARGETS (FAST)"
 KillBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 KillBtn.Font = Enum.Font.GothamBold
 KillBtn.TextSize = 10
@@ -104,14 +105,13 @@ CloseBtn.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Function to find and trigger the gun's InflictTarget remote event on all enemies
+-- High-speed optimized trigger function
 local function triggerRemoteKill()
     local char = LocalPlayer.Character
     local tool = char and char:FindFirstChildOfClass("Tool")
     if not tool then
-        -- Check backpack if not equipped
         for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
-            if item:IsA("Tool") and (item:FindFirstChild("GunScript_Server") or item:FindFirstChild("Setting")) then
+            if item:IsA("Tool") then
                 tool = item
                 break
             end
@@ -124,37 +124,46 @@ local function triggerRemoteKill()
         return false
     end
 
-    local serverScript = tool:FindFirstChild("GunScript_Server")
-    local inflictRemote = serverScript and serverScript:FindFirstChild("InflictTarget")
+    local inflictRemote = tool:FindFirstChild("InflictTarget", true) 
+        or ReplicatedStorage:FindFirstChild("InflictTarget", true)
 
     if not inflictRemote then
         StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "❌ 'InflictTarget' remote not found in this tool!"
+        StatusLabel.Text = "❌ 'InflictTarget' remote not found!"
         return false
     end
 
     local hitCount = 0
-    for _, obj in ipairs(Workspace:GetDescendants()) do
-        if obj:IsA("Model") and obj ~= char then
-            local hum = obj:FindFirstChildOfClass("Humanoid")
-            local part = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Head") or obj:FindFirstChildWhichIsA("BasePart")
-            -- Make sure it's an NPC/Monster/Rake, not another player unless desired
-            if hum and part and hum.Health > 0 and not Players:GetPlayerFromCharacter(obj) then
-                pcall(function()
-                    inflictRemote:FireServer(hum, part)
-                    hitCount += 1
-                end)
+    
+    -- Fast recursive container scan that avoids heavy part iterations
+    local function scanContainer(container)
+        for _, obj in ipairs(container:GetChildren()) do
+            if obj:IsA("Model") and obj ~= char then
+                local hum = obj:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 and not Players:GetPlayerFromCharacter(obj) then
+                    local part = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Head") or obj:FindFirstChildWhichIsA("BasePart")
+                    if part then
+                        pcall(function()
+                            inflictRemote:FireServer(hum, part)
+                            hitCount += 1
+                        end)
+                    end
+                end
+            elseif obj:IsA("Folder") then
+                scanContainer(obj)
             end
         end
     end
 
+    scanContainer(Workspace)
+
     if hitCount > 0 then
         StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
-        StatusLabel.Text = string.format("✅ Sent remote kill packets to %d target(s)!", hitCount)
+        StatusLabel.Text = string.format("✅ High-speed remote packets sent to %d target(s)!", hitCount)
         return true
     else
         StatusLabel.TextColor3 = Color3.fromRGB(255, 180, 0)
-        StatusLabel.Text = "⚠️ Gun found, but no active targets/monsters detected nearby."
+        StatusLabel.Text = "⚠️ Gun found, but no active targets nearby."
         return false
     end
 end
@@ -177,9 +186,9 @@ task.spawn(function()
             pcall(function()
                 triggerRemoteKill()
             end)
-            task.wait(0.2)
+            task.wait(0.05) -- Much faster loop interval
         else
-            task.wait(0.5)
+            task.wait(0.3)
         end
     end
 end)
