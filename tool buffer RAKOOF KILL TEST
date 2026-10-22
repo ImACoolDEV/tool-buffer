@@ -1,26 +1,25 @@
--- Banana Hub V5.0 | Universal Weapon & Tool God Mode Injector 🍌🦈
+-- Banana Hub V5.0 | Direct Remote Event Weapon Exploit 🍌🦈
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 local ParentGui = (pcall(function() return gethui() end) and gethui()) or CoreGui
 
-if ParentGui:FindFirstChild("UniversalWeaponHubGui") then
-    ParentGui.UniversalWeaponHubGui:Destroy()
+if ParentGui:FindFirstChild("RemoteWeaponHubGui") then
+    ParentGui.RemoteWeaponHubGui:Destroy()
 end
 
 local ScreenGui = Instance.new("ScreenGui", ParentGui)
-ScreenGui.Name = "UniversalWeaponHubGui"
+ScreenGui.Name = "RemoteWeaponHubGui"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 999
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Size = UDim2.new(0, 380, 0, 260)
+MainFrame.Size = UDim2.new(0, 380, 0, 240)
 MainFrame.Position = UDim2.new(0.5, 0, 0.4, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(22, 20, 26)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14)
@@ -55,41 +54,41 @@ end)
 local TitleBar = Instance.new("TextLabel", MainFrame)
 TitleBar.Size = UDim2.new(1, 0, 0, 40)
 TitleBar.BackgroundColor3 = Color3.fromRGB(35, 30, 22)
-TitleBar.Text = "🍌 UNIVERSAL WEAPON GOD MODE & MAX STATS"
+TitleBar.Text = "🍌 REMOTE WEAPON BYPASS & KILLER"
 TitleBar.TextColor3 = Color3.fromRGB(255, 200, 0)
 TitleBar.Font = Enum.Font.GothamBold
-TitleBar.TextSize = 10
+TitleBar.TextSize = 11
 Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 14)
 
 local StatusLabel = Instance.new("TextLabel", MainFrame)
-StatusLabel.Size = UDim2.new(1, -20, 0, 50)
+StatusLabel.Size = UDim2.new(1, -20, 0, 45)
 StatusLabel.Position = UDim2.new(0, 10, 0, 48)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Supercharges damage, ammo, and fire rate for ALL weapons in your inventory!"
+StatusLabel.Text = "Equip any gun, then click below to force-inflict damage via server remotes!"
 StatusLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 11
 StatusLabel.TextWrapped = true
 
-local BuffBtn = Instance.new("TextButton", MainFrame)
-BuffBtn.Size = UDim2.new(0.88, 0, 0, 42)
-BuffBtn.Position = UDim2.new(0.06, 0, 0.58, 0)
-BuffBtn.BackgroundColor3 = Color3.fromRGB(220, 160, 0)
-BuffBtn.Text = "🚀 SUPERCHARGE ALL WEAPONS"
-BuffBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-BuffBtn.Font = Enum.Font.GothamBold
-BuffBtn.TextSize = 11
-Instance.new("UICorner", BuffBtn).CornerRadius = UDim.new(0, 8)
+local KillBtn = Instance.new("TextButton", MainFrame)
+KillBtn.Size = UDim2.new(0.88, 0, 0, 42)
+KillBtn.Position = UDim2.new(0.06, 0, 0.58, 0)
+KillBtn.BackgroundColor3 = Color3.fromRGB(220, 160, 0)
+KillBtn.Text = "💀 INSTANT KILL ALL TARGETS (REMOTE)"
+KillBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+KillBtn.Font = Enum.Font.GothamBold
+KillBtn.TextSize = 10
+Instance.new("UICorner", KillBtn).CornerRadius = UDim.new(0, 8)
 
-local AutoBuffToggle = Instance.new("TextButton", MainFrame)
-AutoBuffToggle.Size = UDim2.new(0.88, 0, 0, 38)
-AutoBuffToggle.Position = UDim2.new(0.06, 0, 0.78, 0)
-AutoBuffToggle.BackgroundColor3 = Color3.fromRGB(35, 30, 22)
-AutoBuffToggle.Text = "⚡ AUTO-APPLY TO ALL WEAPONS: OFF"
-AutoBuffToggle.TextColor3 = Color3.fromRGB(200, 200, 200)
-AutoBuffToggle.Font = Enum.Font.GothamBold
-AutoBuffToggle.TextSize = 10
-Instance.new("UICorner", AutoBuffToggle).CornerRadius = UDim.new(0, 8)
+local AutoKillToggle = Instance.new("TextButton", MainFrame)
+AutoKillToggle.Size = UDim2.new(0.88, 0, 0, 38)
+AutoKillToggle.Position = UDim2.new(0.06, 0, 0.78, 0)
+AutoKillToggle.BackgroundColor3 = Color3.fromRGB(35, 30, 22)
+AutoKillToggle.Text = "⚡ AUTO-KILL LOOP: OFF"
+AutoKillToggle.TextColor3 = Color3.fromRGB(200, 200, 200)
+AutoKillToggle.Font = Enum.Font.GothamBold
+AutoKillToggle.TextSize = 11
+Instance.new("UICorner", AutoKillToggle).CornerRadius = UDim.new(0, 8)
 
 local CloseBtn = Instance.new("TextButton", MainFrame)
 CloseBtn.Size = UDim2.new(0, 26, 0, 26)
@@ -105,109 +104,82 @@ CloseBtn.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
-local function superchargeTool(tool)
-    if not tool or not tool:IsA("Tool") then return end
-    
-    -- 1. Modify Configuration folder values (Damage, HitCD, Cooldown)
-    local config = tool:FindFirstChild("Configuration")
-    if config then
-        for _, obj in ipairs(config:GetChildren()) do
-            if obj:IsA("NumberValue") or obj:IsA("IntValue") then
-                local name = obj.Name:lower()
-                if name:find("damage") then
-                    obj.Value = 999999999
-                elseif name:find("cd") or name:find("cooldown") then
-                    obj.Value = 0
-                end
-            end
-        end
-    end
-
-    -- 2. Modify Settings Module if present (bypassing strict table checks)
-    local settingModule = tool:FindFirstChild("Setting")
-    if settingModule then
-        local success, settingsTable = pcall(function()
-            return require(settingModule)
-        end)
-        if success and type(settingsTable) == "table" then
-            pcall(function()
-                settingsTable.BaseDamage = 999999
-                settingsTable.FireRate = 0.001
-                settingsTable.AmmoPerClip = 99999
-                settingsTable.MaxClip = 99999
-                settingsTable.Spread = 0
-                settingsTable.Auto = true
-                settingsTable.Piercing = 10
-            end)
-        end
-    end
-
-    -- 3. Modify any other NumberValues or IntValues across all descendants
-    for _, obj in ipairs(tool:GetDescendants()) do
-        if obj:IsA("NumberValue") or obj:IsA("IntValue") then
-            local name = obj.Name:lower()
-            if name:find("damage") then
-                obj.Value = 999999999
-            elseif name:find("ammo") then
-                obj.Value = 99999
-            elseif name:find("cd") or name:find("cooldown") then
-                obj.Value = 0
-            end
-        end
-    end
-end
-
-local function scanAndBuffAll()
+-- Function to find and trigger the gun's InflictTarget remote event on all enemies
+local function triggerRemoteKill()
     local char = LocalPlayer.Character
-    local backpack = LocalPlayer:FindFirstChild("Backpack")
-    
-    local count = 0
-    if char then
-        for _, item in ipairs(char:GetChildren()) do
-            if item:IsA("Tool") then
-                superchargeTool(item)
-                count += 1
+    local tool = char and char:FindFirstChildOfClass("Tool")
+    if not tool then
+        -- Check backpack if not equipped
+        for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
+            if item:IsA("Tool") and (item:FindFirstChild("GunScript_Server") or item:FindFirstChild("Setting")) then
+                tool = item
+                break
             end
         end
     end
-    if backpack then
-        for _, item in ipairs(backpack:GetChildren()) do
-            if item:IsA("Tool") then
-                superchargeTool(item)
-                count += 1
+
+    if not tool then
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        StatusLabel.Text = "❌ Hold or have a gun in your inventory first!"
+        return false
+    end
+
+    local serverScript = tool:FindFirstChild("GunScript_Server")
+    local inflictRemote = serverScript and serverScript:FindFirstChild("InflictTarget")
+
+    if not inflictRemote then
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        StatusLabel.Text = "❌ 'InflictTarget' remote not found in this tool!"
+        return false
+    end
+
+    local hitCount = 0
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj ~= char then
+            local hum = obj:FindFirstChildOfClass("Humanoid")
+            local part = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Head") or obj:FindFirstChildWhichIsA("BasePart")
+            -- Make sure it's an NPC/Monster/Rake, not another player unless desired
+            if hum and part and hum.Health > 0 and not Players:GetPlayerFromCharacter(obj) then
+                pcall(function()
+                    inflictRemote:FireServer(hum, part)
+                    hitCount += 1
+                end)
             end
         end
     end
-    return count
+
+    if hitCount > 0 then
+        StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
+        StatusLabel.Text = string.format("✅ Sent remote kill packets to %d target(s)!", hitCount)
+        return true
+    else
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 180, 0)
+        StatusLabel.Text = "⚠️ Gun found, but no active targets/monsters detected nearby."
+        return false
+    end
 end
 
-BuffBtn.Activated:Connect(function()
-    local count = scanAndBuffAll()
-    if count > 0 then
-        StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
-        StatusLabel.Text = string.format("✅ Successfully supercharged %d weapon(s)!", count)
-    else
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "❌ No weapons found in your character or backpack!"
-    end
+KillBtn.Activated:Connect(function()
+    triggerRemoteKill()
 end)
 
-local autoEnabled = false
-AutoBuffToggle.Activated:Connect(function()
-    autoEnabled = not autoEnabled
-    AutoBuffToggle.Text = autoEnabled and "⚡ AUTO-APPLY TO ALL WEAPONS: ON" or "⚡ AUTO-APPLY TO ALL WEAPONS: OFF"
-    AutoBuffToggle.BackgroundColor3 = autoEnabled and Color3.fromRGB(200, 160, 0) or Color3.fromRGB(35, 30, 22)
-    AutoBuffToggle.TextColor3 = autoEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+local autoKillActive = false
+AutoKillToggle.Activated:Connect(function()
+    autoKillActive = not autoKillActive
+    AutoKillToggle.Text = autoKillActive and "⚡ AUTO-KILL LOOP: ON" or "⚡ AUTO-KILL LOOP: OFF"
+    AutoKillToggle.BackgroundColor3 = autoKillActive and Color3.fromRGB(200, 160, 0) or Color3.fromRGB(35, 30, 22)
+    AutoKillToggle.TextColor3 = autoKillActive and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
 end)
 
--- Continuous background loop for auto-applying to newly equipped weapons
 task.spawn(function()
     while true do
-        if autoEnabled then
+        if autoKillActive then
             pcall(function()
-                scanAndBuffAll()
+                triggerRemoteKill()
             end)
+            task.wait(0.2)
+        else
+            task.wait(0.5)
         end
-        task.wait(0.4)
     end
 end)
