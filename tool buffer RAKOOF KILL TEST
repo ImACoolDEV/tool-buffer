@@ -1,33 +1,34 @@
--- Rake Killer Tool + Optimized Lag-Free Anti-Damage Shield
+-- Banana Hub V5.0 | TaurusJudge Ultimate Weapon Mod 🍌🦈
+
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 local ParentGui = (pcall(function() return gethui() end) and gethui()) or CoreGui
 
-if ParentGui:FindFirstChild("RakeKillerGui") then
-    ParentGui.RakeKillerGui:Destroy()
+if ParentGui:FindFirstChild("TaurusJudgeHubGui") then
+    ParentGui.TaurusJudgeHubGui:Destroy()
 end
 
 local ScreenGui = Instance.new("ScreenGui", ParentGui)
-ScreenGui.Name = "RakeKillerGui"
+ScreenGui.Name = "TaurusJudgeHubGui"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 999
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Size = UDim2.new(0, 360, 0, 240)
+MainFrame.Size = UDim2.new(0, 380, 0, 260)
 MainFrame.Position = UDim2.new(0.5, 0, 0.4, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+MainFrame.BackgroundColor3 = Color3.fromRGB(22, 20, 26)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14)
 local MainStroke = Instance.new("UIStroke", MainFrame)
-MainStroke.Thickness = 2
-MainStroke.Color = Color3.fromRGB(255, 50, 50)
+MainStroke.Thickness = 2.5
+MainStroke.Color = Color3.fromRGB(255, 200, 0)
 
--- Draggable implementation
+-- Draggable logic
 local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
 MainFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -51,172 +52,165 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Title Bar
 local TitleBar = Instance.new("TextLabel", MainFrame)
-TitleBar.Size = UDim2.new(1, 0, 0, 38)
-TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-TitleBar.Text = "💀 LAG-FREE RAKE SHIELD & KILLER"
-TitleBar.TextColor3 = Color3.fromRGB(255, 80, 80)
+TitleBar.Size = UDim2.new(1, 0, 0, 40)
+TitleBar.BackgroundColor3 = Color3.fromRGB(35, 30, 22)
+TitleBar.Text = "🍌 TAURUS JUDGE GOD MODE & MAX STATS"
+TitleBar.TextColor3 = Color3.fromRGB(255, 200, 0)
 TitleBar.Font = Enum.Font.GothamBold
 TitleBar.TextSize = 11
-Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 14)
 
--- Status Text
 local StatusLabel = Instance.new("TextLabel", MainFrame)
-StatusLabel.Size = UDim2.new(1, -20, 0, 45)
-StatusLabel.Position = UDim2.new(0, 10, 0, 45)
+StatusLabel.Size = UDim2.new(1, -20, 0, 50)
+StatusLabel.Position = UDim2.new(0, 10, 0, 48)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Hold tool in hand & click apply buff to maximize damage & range!"
-StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+StatusLabel.Text = "Equip 'TaurusJudge' and click below to supercharge damage, ammo, and fire rate!"
+StatusLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 11
 StatusLabel.TextWrapped = true
 
--- Action Button
-local BuffButton = Instance.new("TextButton", MainFrame)
-BuffButton.Size = UDim2.new(0.88, 0, 0, 40)
-BuffButton.Position = UDim2.new(0.06, 0, 0.58, 0)
-BuffButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
-BuffButton.Text = "🛡️ APPLY BUFF & TRUE KILL"
-BuffButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-BuffButton.Font = Enum.Font.GothamBold
-BuffButton.TextSize = 11
-Instance.new("UICorner", BuffButton).CornerRadius = UDim.new(0, 8)
+local BuffBtn = Instance.new("TextButton", MainFrame)
+BuffBtn.Size = UDim2.new(0.88, 0, 0, 42)
+BuffBtn.Position = UDim2.new(0.06, 0, 0.58, 0)
+BuffBtn.BackgroundColor3 = Color3.fromRGB(220, 160, 0)
+BuffBtn.Text = "🚀 SUPERCHARGE TAURUS JUDGE"
+BuffBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+BuffBtn.Font = Enum.Font.GothamBold
+BuffBtn.TextSize = 11
+Instance.new("UICorner", BuffBtn).CornerRadius = UDim.new(0, 8)
 
--- Shield Toggle Button
-local ShieldToggleBtn = Instance.new("TextButton", MainFrame)
-ShieldToggleBtn.Size = UDim2.new(0.88, 0, 0, 35)
-ShieldToggleBtn.Position = UDim2.new(0.06, 0, 0.78, 0)
-ShieldToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-ShieldToggleBtn.Text = "🛡️ OPTIMIZED SHIELD: OFF"
-ShieldToggleBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-ShieldToggleBtn.Font = Enum.Font.GothamBold
-ShieldToggleBtn.TextSize = 11
-Instance.new("UICorner", ShieldToggleBtn).CornerRadius = UDim.new(0, 8)
+local AutoBuffToggle = Instance.new("TextButton", MainFrame)
+AutoBuffToggle.Size = UDim2.new(0.88, 0, 0, 38)
+AutoBuffToggle.Position = UDim2.new(0.06, 0, 0.78, 0)
+AutoBuffToggle.BackgroundColor3 = Color3.fromRGB(35, 30, 22)
+AutoBuffToggle.Text = "⚡ AUTO-APPLY ON EQUIP: OFF"
+AutoBuffToggle.TextColor3 = Color3.fromRGB(200, 200, 200)
+AutoBuffToggle.Font = Enum.Font.GothamBold
+AutoBuffToggle.TextSize = 11
+Instance.new("UICorner", AutoBuffToggle).CornerRadius = UDim.new(0, 8)
 
--- Close Button
-local CloseButton = Instance.new("TextButton", MainFrame)
-CloseButton.Size = UDim2.new(0, 24, 0, 24)
-CloseButton.Position = UDim2.new(1, -30, 0, 7)
-CloseButton.BackgroundColor3 = Color3.fromRGB(150, 20, 20)
-CloseButton.Text = "X"
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.Font = Enum.Font.GothamBold
-CloseButton.TextSize = 10
-Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(0, 6)
+local CloseBtn = Instance.new("TextButton", MainFrame)
+CloseBtn.Size = UDim2.new(0, 26, 0, 26)
+CloseBtn.Position = UDim2.new(1, -34, 0, 7)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.new(1,1,1)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 10
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
 
-CloseButton.Activated:Connect(function()
+CloseBtn.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Fast Rake Finder
-local function findRakeModel()
-    for _, obj in ipairs(Workspace:GetChildren()) do
-        if obj:IsA("Model") and (obj.Name == "THE_RAKE" or obj.Name:lower():find("rake") or obj.Name:lower():find("rakoof")) then
-            local part = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Torso") or obj:FindFirstChildWhichIsA("BasePart")
-            if part then return obj, part end
-        end
-    end
-    return nil, nil
-end
-
-local shieldEnabled = false
-ShieldToggleBtn.Activated:Connect(function()
-    shieldEnabled = not shieldEnabled
-    ShieldToggleBtn.Text = shieldEnabled and "🛡️ OPTIMIZED SHIELD: ON" or "🛡️ OPTIMIZED SHIELD: OFF"
-    ShieldToggleBtn.BackgroundColor3 = shieldEnabled and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(35, 35, 45)
-    ShieldToggleBtn.TextColor3 = shieldEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
-end)
-
--- Lightweight background shield task
-task.spawn(function()
-    while true do
-        if shieldEnabled then
-            pcall(function()
-                local rakeModel, rakePart = findRakeModel()
-                local char = LocalPlayer.Character
-                local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                
-                if rakeModel and rakePart and hrp then
-                    local distance = (hrp.Position - rakePart.Position).Magnitude
-                    if distance < 35 then
-                        rakePart.CFrame = hrp.CFrame * CFrame.new(0, 0, -35)
-                    end
-                end
-            end)
-            task.wait(0.1)
-        else
-            task.wait(0.5)
-        end
-    end
-end)
-
-BuffButton.Activated:Connect(function()
-    local char = LocalPlayer.Character
-    local tool = char and char:FindFirstChildOfClass("Tool")
+local function superchargeTool(tool)
+    if not tool or tool.Name ~= "TaurusJudge" then return end
     
-    if not tool then
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "❌ Hold your StunStick tool in your hand first!"
-        return
-    end
-
-    -- Boost configuration values matching your tool screenshot structure
+    -- 1. Modify Configuration folder values if present
     local config = tool:FindFirstChild("Configuration")
     if config then
-        local dmg = config:FindFirstChild("Damage")
-        if dmg and dmg:IsA("NumberValue") then
-            dmg.Value = 999999999
-        end
-        local hitCd = config:FindFirstChild("HitCD")
-        if hitCd and hitCd:IsA("NumberValue") then
-            hitCd.Value = 0
-        end
-    end
-
-    -- Also check descendants for any other Damage/HitCD values
-    for _, obj in ipairs(tool:GetDescendants()) do
-        if obj:IsA("NumberValue") or obj:IsA("IntValue") then
-            if obj.Name:lower() == "damage" then
-                obj.Value = 999999999
-            elseif obj.Name:lower() == "hitcd" or obj.Name:lower() == "cooldown" then
-                obj.Value = 0
+        for _, obj in ipairs(config:GetChildren()) do
+            if obj:IsA("NumberValue") or obj:IsA("IntValue") then
+                if obj.Name:lower() == "damage" then
+                    obj.Value = 999999999
+                elseif obj.Name:lower() == "hitcd" or obj.Name:lower() == "cooldown" then
+                    obj.Value = 0
+                end
             end
         end
     end
 
-    -- Setup touch listener to instantly kill the Rake on impact using the tool handle
-    local handle = tool:FindFirstChild("Handle") or tool:FindFirstChildWhichIsA("BasePart")
-    if handle then
-        if not tool:FindFirstChild("TrueRakeKillerTag") then
-            local tag = Instance.new("BoolValue", tool)
-            tag.Name = "TrueRakeKillerTag"
-
-            handle.Touched:Connect(function(hit)
-                if not hit or not hit.Parent then return end
-                local hitModel = hit:FindFirstAncestorOfClass("Model")
-                
-                if hitModel and (hitModel.Name == "THE_RAKE" or hitModel.Name:lower():find("rake") or hitModel.Name:lower():find("rakoof")) and not Players:GetPlayerFromCharacter(hitModel) then
-                    local hum = hitModel:FindFirstChildOfClass("Humanoid")
-                    if hum then
-                        pcall(function()
-                            hum.Health = 0
-                            hum:ChangeState(Enum.HumanoidStateType.Dead)
-                            -- Fire any remote events found inside the tool to sync with the server
-                            for _, remote in ipairs(tool:GetDescendants()) do
-                                if remote:IsA("RemoteEvent") or remote:IsA("UnreliableRemoteEvent") then
-                                    remote:FireServer(hum, 999999999)
-                                    remote:FireServer(hitModel, 999999999)
-                                end
-                            end
-                            hitModel:BreakJoints()
-                        end)
-                    end
-                end
+    -- 2. Modify Settings module if found
+    local settingModule = tool:FindFirstChild("Setting")
+    if settingModule then
+        local success, settingsTable = pcall(function()
+            return require(settingModule)
+        end)
+        if success and type(settingsTable) == "table" then
+            pcall(function()
+                settingsTable.BaseDamage = 999999
+                settingsTable.FireRate = 0.001
+                settingsTable.AmmoPerClip = 99999
+                settingsTable.MaxClip = 99999
+                settingsTable.Spread = 0
+                settingsTable.Auto = true
+                settingsTable.Piercing = 10
             end)
         end
     end
 
-    StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
-    StatusLabel.Text = "✅ Tool Buffed! Damage set to max & Cooldown cleared."
+    -- 3. Modify any other NumberValues / IntValues inside the tool
+    for _, obj in ipairs(tool:GetDescendants()) do
+        if obj:IsA("NumberValue") or obj:IsA("IntValue") then
+            if obj.Name:lower() == "damage" then
+                obj.Value = 999999999
+            elseif obj.Name:lower() == "ammo" or obj.Name:lower() == "ammoperclip" then
+                obj.Value = 99999
+            end
+        end
+    end
+end
+
+BuffBtn.Activated:Connect(function()
+    local char = LocalPlayer.Character
+    local backpack = LocalPlayer:FindFirstChild("Backpack")
+    
+    local found = false
+    if char then
+        for _, item in ipairs(char:GetChildren()) do
+            if item.Name == "TaurusJudge" then
+                superchargeTool(item)
+                found = true
+            end
+        end
+    end
+    if backpack then
+        for _, item in ipairs(backpack:GetChildren()) do
+            if item.Name == "TaurusJudge" then
+                superchargeTool(item)
+                found = true
+            end
+        end
+    end
+
+    if found then
+        StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
+        StatusLabel.Text = "✅ TaurusJudge Supercharged successfully!"
+    else
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        StatusLabel.Text = "❌ TaurusJudge not found in character or backpack!"
+    end
+end)
+
+local autoEnabled = false
+AutoBuffToggle.Activated:Connect(function()
+    autoEnabled = not autoEnabled
+    AutoBuffToggle.Text = autoEnabled and "⚡ AUTO-APPLY ON EQUIP: ON" or "⚡ AUTO-APPLY ON EQUIP: OFF"
+    AutoBuffToggle.BackgroundColor3 = autoEnabled and Color3.fromRGB(200, 160, 0) or Color3.fromRGB(35, 30, 22)
+    AutoBuffToggle.TextColor3 = autoEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+end)
+
+-- Continuous auto-application loop if enabled
+task.spawn(function()
+    while true do
+        if autoEnabled then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local backpack = LocalPlayer:FindFirstChild("Backpack")
+                if char then
+                    for _, item in ipairs(char:GetChildren()) do
+                        superchargeTool(item)
+                    end
+                end
+                if backpack then
+                    for _, item in ipairs(backpack:GetChildren()) do
+                        superchargeTool(item)
+                    end
+                end
+            end)
+        end
+        task.wait(0.5)
+    end
 end)
